@@ -42,5 +42,10 @@ pipeline {
                 }
             }
         }
+        stage('Docker Compose') {
+            steps {
+                sh 'docker compose --env-file /var/lib/jenkins/ecommerce.env up -d'
+            }
+        }
     }
 }
