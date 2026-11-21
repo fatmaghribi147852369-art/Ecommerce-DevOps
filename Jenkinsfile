@@ -13,7 +13,7 @@ pipeline {
         stage('Maven Build') {
             steps {
                 dir('backend') {
-                    sh 'docker run --rm -v "$PWD:/app" -w /app maven:3.9-eclipse-temurin-22 mvn clean package -DskipTests'
+                    sh 'docker run --rm -v "$PWD:/app" -v maven-cache:/root/.m2 -w /app maven:3.9-eclipse-temurin-22 mvn -B -ntp clean package -DskipTests'
                 }
             }
         }
