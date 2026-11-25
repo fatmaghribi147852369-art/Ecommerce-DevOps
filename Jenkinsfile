@@ -18,7 +18,7 @@ pipeline {
             }
         }
 
-        stage('Building Image') {
+        stage('Building Backend Image') {
             steps {
                 dir('backend') {
                     sh 'docker build -t ecommerce-backend:1.0 .'
@@ -26,7 +26,15 @@ pipeline {
             }
         }
 
-        stage('Push Image') {
+        stage('Building Frontend Image') {
+            steps {
+                dir('Frontend') {
+                    sh 'docker build -t ecommerce-frontend:1.0 .'
+                }
+            }
+        }
+
+        stage('Push Images') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'de439775-53ff-4e9a-b677-952c2e736b00',
@@ -35,16 +43,22 @@ pipeline {
                 )]) {
                     sh '''
                         echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USER" --password-stdin
+
                         docker tag ecommerce-backend:1.0 fatmaghribi123/ecommerce-backend:1.0
                         docker push fatmaghribi123/ecommerce-backend:1.0
+
+                        docker tag ecommerce-frontend:1.0 fatmaghribi123/ecommerce-frontend:1.0
+                        docker push fatmaghribi123/ecommerce-frontend:1.0
+
                         docker logout
                     '''
                 }
             }
         }
+
         stage('Docker Compose') {
             steps {
-                sh 'docker compose --env-file /var/lib/jenkins/ecommerce.env up -d'
+                sh 'docker compose up -d'
             }
         }
     }
